@@ -11,7 +11,7 @@ services:
       TZ: Asia/Dhaka
     env_file:
       - ./.env
-    # command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci','--default-time-zone=+06:00']
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci','--default-time-zone=+06:00']
     volumes:
       - ./config/mysql-8:/docker-entrypoint-initdb.d
       - ./data/mysql-8:/var/lib/mysql

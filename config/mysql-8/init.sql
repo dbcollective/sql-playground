@@ -38,34 +38,43 @@ DELIMITER $$
 CREATE PROCEDURE seeding()
 BEGIN
     DECLARE i INT DEFAULT 0;
-    WHILE i < 10000000 DO
-        INSERT INTO users (username, income, is_active, created_at) VALUES (
-            LEFT(MD5(RAND()), 25),
-            FLOOR(RAND() * 100000),
-            FLOOR(RAND() * 10) % 2,
-            FROM_UNIXTIME(UNIX_TIMESTAMP('2022-01-01 01:00:00')+FLOOR(RAND()*31536000))
-        );
+    WHILE i < 1000 DO
+        INSERT INTO users (username, income, is_active, created_at)
+        WITH RECURSIVE data(w, x, y, z) AS (
+            SELECT LEFT(MD5(RAND()), 25), 
+                FLOOR(RAND() * 100000),
+                FLOOR(RAND() * 10) % 2,
+                FROM_UNIXTIME(ROUND(RAND() * (1356892200 - 1325356200)) + 1325356200)
+            UNION ALL
+            SELECT LEFT(MD5(RAND()), 25), 
+                FLOOR(RAND() * 100000),
+                FLOOR(RAND() * 10) % 2,
+                FROM_UNIXTIME(ROUND(RAND() * (1356892200 - 1325356200)) + 1325356200)
+            FROM data
+            LIMIT 1000
+        )
+        SELECT * FROM data;
 
-        INSERT INTO comments (user_id, message, status) VALUES (
-            i + 1,
-            SUBSTRING(MD5(RAND()) FROM 1 FOR 100),
-            ELT(0.5 + RAND() * 4, 'submitted', 'reviewed', 'published', 'removed')
-        ),
-        (
-            i + 1,
-            SUBSTRING(MD5(RAND()) FROM 1 FOR 100),
-            ELT(0.5 + RAND() * 4, 'submitted', 'reviewed', 'published', 'removed')
-        );
+        -- INSERT INTO comments (user_id, message, status) VALUES (
+        --     i + 1,
+        --     SUBSTRING(MD5(RAND()) FROM 1 FOR 100),
+        --     ELT(0.5 + RAND() * 4, 'submitted', 'reviewed', 'published', 'removed')
+        -- ),
+        -- (
+        --     i + 1,
+        --     SUBSTRING(MD5(RAND()) FROM 1 FOR 100),
+        --     ELT(0.5 + RAND() * 4, 'submitted', 'reviewed', 'published', 'removed')
+        -- );
         SET i = i + 1;
     END WHILE;
 
-    DECLARE j INT DEFAULT 0;
-    WHILE j < 10000 DO
-        INSERT INTO tags (title) VALUES (
-            CONCAT('tag', i)
-        );
-        SET j = j + 1;
-    END WHILE;
+    -- DECLARE j INT DEFAULT 0;
+    -- WHILE j < 10000 DO
+    --     INSERT INTO tags (title) VALUES (
+    --         CONCAT('tag', j)
+    --     );
+    --     SET j = j + 1;
+    -- END WHILE;
 END$$
 DELIMITER ;
 
