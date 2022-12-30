@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if [[ $# -ne 1 ]]; then
+    echo 'Too many/few arguments, expecting one' >&2
+    exit 1
+fi
+
+case $1 in
+    start)
+        docker-compose down && docker-compose up -d ;;
+    restart)
+        docker-compose restart ;;
+    stop)
+        docker-compose down ;;
+    mysql)
+        set -o allexport
+        source .env
+        set +o allexport
+        docker-compose exec -it mysql-8 /bin/bash -c 'export MYSQL_PWD='$DB_PASSWORD'; mysql -u '$DB_USER ;;
+    *)
+        # The wrong first argument.
+        echo 'Expected "start", "restart", "stop", "boot", "node1", "node2" or "node3"' >&2
+        exit 1
+esac

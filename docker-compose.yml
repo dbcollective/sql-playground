@@ -1,0 +1,64 @@
+version: '3.8'
+services:
+  mysql-8:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      TZ: Asia/Dhaka
+    env_file:
+      - ./.env
+    # command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci','--default-time-zone=+06:00']
+    volumes:
+      - ./config/mysql-8:/docker-entrypoint-initdb.d
+      - ./data/mysql-8:/var/lib/mysql
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1GB
+        reservations:
+          cpus: '0.25'
+          memory: 200M
+
+  # percona-8:
+  #   image: amd64/percona:8.0
+  #   restart: unless-stopped
+  #   environment:
+  #     MYSQL_DATABASE: ${DB_NAME}
+  #     MYSQL_USER: ${DB_USER}
+  #     MYSQL_PASSWORD: ${DB_PASSWORD}
+  #     MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+  #   env_file:
+  #     - ./.env
+  #   volumes:
+  #     # - ./my-init.sql:/docker-entrypoint-initdb.d/my-init.sql
+  #     - ./data/percona-8:/var/lib/mysql
+
+  # postgres-15:
+  #   image: postgres:15
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #     POSTGRES_USER: ${DB_USER}
+  #     POSTGRES_DB: ${DB_NAME}
+  #   volumes:
+  #     - ./data/postgres-15:/var/lib/postgresql/data
+  #     # - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  # mssql-2022:
+  #   image: mcr.microsoft.com/azure-sql-edge
+  #   restart: unless-stopped
+  #   environment:
+  #     ACCEPT_EULA: 1
+  #     MSSQL_SA_PASSWORD: ${DB_ROOT_PASSWORD}
+  #     MSSQL_USER: ${DB_USER}
+  #     MSSQL_PID: Developer
+  #   env_file:
+  #     - ./.env
+  #   volumes:
+  #     - ./data/mssql-2022:/sql_data
+  #     # - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
