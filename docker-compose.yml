@@ -69,16 +69,48 @@ services:
           cpus: '0.25'
           memory: 200M
 
-  # mssql-2022:
-  #   image: mcr.microsoft.com/azure-sql-edge
-  #   restart: unless-stopped
-  #   environment:
-  #     ACCEPT_EULA: 1
-  #     MSSQL_SA_PASSWORD: ${DB_ROOT_PASSWORD}
-  #     MSSQL_USER: ${DB_USER}
-  #     MSSQL_PID: Developer
-  #   env_file:
-  #     - ./.env
-  #   volumes:
-  #     - ./data/mssql-2022:/sql_data
-  #     # - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+# https://learn.microsoft.com/en-us/azure/azure-sql-edge/disconnected-deployment
+# https://github.com/mcmoe/mssqldocker
+  mssql-2022:
+    image: mcr.microsoft.com/azure-sql-edge
+    command: /opt/mssql/bin/sqlservr
+    ports:
+      - 1433:1433
+    cap_add:
+      - SYS_PTRACE
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: 1
+      MSSQL_SA_PASSWORD: ${DB_ROOT_PASSWORD}
+      MSSQL_USER: ${DB_USER}
+      MSSQL_PASSWORD: ${DB_PASSWORD}
+      MSSQL_DATABASE: ${DB_NAME}
+      MSSQL_SLEEP: 7
+    env_file:
+      - ./.env
+    stdin_open: true
+    volumes:
+      - ./data/mssql-2022:/var/opt/mssql
+      - ./config/mssql-2022:/docker-entrypoint-initdb.d
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1GB
+        reservations:
+          cpus: '0.25'
+          memory: 200M
+# https://stackoverflow.com/questions/71776934/initialize-sql-server-database-in-docker-container-without-sqlcmd
+  sqlcmd:
+    image: mcr.microsoft.com/mssql-tools:latest
+    platform: linux/amd64
+    stdin_open: true
+    environment:
+        MSSQL_SA_PASSWORD: ${DB_ROOT_PASSWORD}
+        MSSQL_DATABASE: ${DB_NAME}
+        MSSQL_BACKUP: "/opt/mssql/data.bak"
+    env_file:
+      - ./.env
+    # command: /bin/bash -c '/opt/mssql-tools/bin/sqlcmd -S mssql -U SA -P SA_Passw0rd -d master -Q "SELECT version()"'
+    volumes:
+      - ./data/mssql-2022/data.bak:/opt/mssql/data.bak

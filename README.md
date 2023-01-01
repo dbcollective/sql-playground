@@ -87,4 +87,7 @@ We also have a helpful bash script for your daily use.
 
 # To SSH into a server and open postgres shell
 ./play postgres
+
+# To SSH into a server and open sqlcmd for SQL Server
+./play mssql
 ```

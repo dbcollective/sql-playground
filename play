@@ -27,8 +27,15 @@ case $1 in
         source .env
         set +o allexport
         docker-compose exec -it postgres-15 psql -U $DB_USER $DB_NAME ;;
+    mssql)
+        set -o allexport
+        source .env
+        set +o allexport
+        docker-compose exec -it sqlcmd /bin/bash -c '/opt/mssql-tools/bin/sqlcmd -S mssql-2022 -U '$DB_USER' -P '$DB_PASSWORD ;;
     *)
         # The wrong first argument.
         echo 'Expected "start", "restart", "stop", "mysql", "postgres", "mssql" or "percona"' >&2
         exit 1
 esac
+
+# sqlcmd -S 211.11.111.111 -d SomeSpecificDatabase -U NotSA -P NotTheSaPassword
