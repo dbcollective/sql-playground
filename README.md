@@ -81,4 +81,10 @@ We also have a helpful bash script for your daily use.
 
 # To SSH into a server and open mysql shell
 ./play mysql
+
+# To SSH into a server and open percona shell
+./play percona
+
+# To SSH into a server and open postgres shell
+./play postgres
 ```

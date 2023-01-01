@@ -24,20 +24,30 @@ services:
           cpus: '0.25'
           memory: 200M
 
-  # percona-8:
-  #   image: amd64/percona:8.0
-  #   restart: unless-stopped
-  #   environment:
-  #     MYSQL_DATABASE: ${DB_NAME}
-  #     MYSQL_USER: ${DB_USER}
-  #     MYSQL_PASSWORD: ${DB_PASSWORD}
-  #     MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-  #   env_file:
-  #     - ./.env
-  #   volumes:
-  #     # - ./my-init.sql:/docker-entrypoint-initdb.d/my-init.sql
-  #     - ./data/percona-8:/var/lib/mysql
-
+  percona-8:
+    image: amd64/percona:8.0
+    platform: linux/amd64
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      TZ: 'Asia/Dhaka'
+    env_file:
+      - ./.env
+    volumes:
+      - ./data/percona-8:/var/lib/mysql
+      - ./config/percona-8:/docker-entrypoint-initdb.d
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1GB
+        reservations:
+          cpus: '0.25'
+          memory: 200M
+      
   postgres-15:
     image: postgres:15
     restart: unless-stopped

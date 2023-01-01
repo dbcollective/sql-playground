@@ -17,6 +17,11 @@ case $1 in
         source .env
         set +o allexport
         docker-compose exec -it mysql-8 /bin/bash -c 'export MYSQL_PWD='$DB_PASSWORD'; mysql -u '$DB_USER' -D '$DB_NAME ;;
+    percona)
+        set -o allexport
+        source .env
+        set +o allexport
+        docker-compose exec -it percona-8 /bin/bash -c 'export MYSQL_PWD='$DB_PASSWORD'; mysql -u '$DB_USER' -D '$DB_NAME ;;
     postgres)
         set -o allexport
         source .env
