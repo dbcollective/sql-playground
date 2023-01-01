@@ -11,14 +11,19 @@ case $1 in
     restart)
         docker-compose restart ;;
     stop)
-        docker-compose down ;;
+        docker-compose down --remove-orphans ;;
     mysql)
         set -o allexport
         source .env
         set +o allexport
-        docker-compose exec -it mysql-8 /bin/bash -c 'export MYSQL_PWD='$DB_PASSWORD'; mysql -u '$DB_USER ;;
+        docker-compose exec -it mysql-8 /bin/bash -c 'export MYSQL_PWD='$DB_PASSWORD'; mysql -u '$DB_USER' -D '$DB_NAME ;;
+    postgres)
+        set -o allexport
+        source .env
+        set +o allexport
+        docker-compose exec -it postgres-15 psql -U $DB_USER $DB_NAME ;;
     *)
         # The wrong first argument.
-        echo 'Expected "start", "restart", "stop", "boot", "node1", "node2" or "node3"' >&2
+        echo 'Expected "start", "restart", "stop", "mysql", "postgres", "mssql" or "percona"' >&2
         exit 1
 esac
