@@ -37,5 +37,3 @@ case $1 in
         echo 'Expected "start", "restart", "stop", "mysql", "postgres", "mssql" or "percona"' >&2
         exit 1
 esac
-
-# sqlcmd -S 211.11.111.111 -d SomeSpecificDatabase -U NotSA -P NotTheSaPassword
