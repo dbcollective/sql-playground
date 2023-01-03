@@ -31,7 +31,7 @@ case $1 in
         set -o allexport
         source .env
         set +o allexport
-        docker-compose exec -it sqlcmd /bin/bash -c '/opt/mssql-tools/bin/sqlcmd -S mssql-2022 -U '$DB_USER' -P '$DB_PASSWORD ;;
+        docker-compose exec -it sqlcmd /bin/bash -c '/opt/mssql-tools/bin/sqlcmd -S mssql-2022 -U '$DB_USER' -P '$DB_PASSWORD' -d '$DB_NAME ;;
     *)
         # The wrong first argument.
         echo 'Expected "start", "restart", "stop", "mysql", "postgres", "mssql" or "percona"' >&2

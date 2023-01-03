@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS tags (
 
 CREATE TABLE IF NOT EXISTS comment_tag (
     comment_id BIGINT NOT NULL,
-    tag_id BIGINT NOT NULL,
+    tag_id INT NOT NULL,
     PRIMARY KEY(tag_id, comment_id),
     INDEX(comment_id)
 );

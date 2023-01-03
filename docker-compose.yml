@@ -69,8 +69,6 @@ services:
           cpus: '0.25'
           memory: 200M
 
-# https://learn.microsoft.com/en-us/azure/azure-sql-edge/disconnected-deployment
-# https://github.com/mcmoe/mssqldocker
   mssql-2022:
     image: mcr.microsoft.com/azure-sql-edge
     command: /opt/mssql/bin/sqlservr
@@ -82,16 +80,13 @@ services:
     environment:
       ACCEPT_EULA: 1
       MSSQL_SA_PASSWORD: ${DB_ROOT_PASSWORD}
-      MSSQL_USER: ${DB_USER}
-      MSSQL_PASSWORD: ${DB_PASSWORD}
-      MSSQL_DATABASE: ${DB_NAME}
       MSSQL_SLEEP: 7
+      TZ: 'Asia/Dhaka'
     env_file:
       - ./.env
     stdin_open: true
     volumes:
       - ./data/mssql-2022:/var/opt/mssql
-      - ./config/mssql-2022:/docker-entrypoint-initdb.d
     deploy:
       resources:
         limits:
@@ -100,17 +95,25 @@ services:
         reservations:
           cpus: '0.25'
           memory: 200M
-# https://stackoverflow.com/questions/71776934/initialize-sql-server-database-in-docker-container-without-sqlcmd
   sqlcmd:
     image: mcr.microsoft.com/mssql-tools:latest
     platform: linux/amd64
     stdin_open: true
+    tty: true
     environment:
         MSSQL_SA_PASSWORD: ${DB_ROOT_PASSWORD}
+        MSSQL_USER: ${DB_USER}
+        MSSQL_PASSWORD: ${DB_PASSWORD}
         MSSQL_DATABASE: ${DB_NAME}
-        MSSQL_BACKUP: "/opt/mssql/data.bak"
     env_file:
       - ./.env
-    # command: /bin/bash -c '/opt/mssql-tools/bin/sqlcmd -S mssql -U SA -P SA_Passw0rd -d master -Q "SELECT version()"'
+    command: /bin/bash -c 'chmod +x /entrypoint.sh && /entrypoint.sh && tail -f /dev/null'
+    depends_on:
+      - mssql-2022
     volumes:
-      - ./data/mssql-2022/data.bak:/opt/mssql/data.bak
+      - ./config/mssql-2022/entrypoint.sh:/entrypoint.sh
+      - ./config/mssql-2022/init.sql:/init.sql
+    healthcheck:
+      test: "/opt/mssql-tools/bin/sqlcmd -U sa -P $${DB_ROOT_PASSWORD} -Q \"select 1\" && grep -q \"MSSQL CONFIG COMPLETE\" ./config.log"
+      interval: 15s
+      retries: 20
